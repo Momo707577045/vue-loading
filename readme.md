@@ -19,7 +19,7 @@
 
    ![](http://upyun.luckly-mjw.cn/Assets/click-constraint/004.jpeg)
 
-### [在线示例](http://10.146.1.233:21321/articel/vue-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4/)
+### [在线示例](http://blog.luckly-mjw.cn/tool-show/vue-loading/demo.html)
 - 页面源码，通过控制台查看即可
 
 ### 使用方式（仅需两步）
