@@ -416,6 +416,13 @@ Vue.directive('waiting', {
 - 由于底层是通过伪类「::after」「::before」来填充元素的，故将会覆盖使用 v-waiting 自定义指令的 dom 元素原本的 「::after」「::before」
 - 本文仅实现 「XMLHttpRequest」 的重载，未对「fetch」方法进行监听，有这方面需求的同学，欢迎提「issues」。
 
+### 通用版本（与框架无关，vue，react，jquery 项目均可）
+- 属性名改为`data-loading`
+- react `data-loading={'get::disable::user/ownCompany'}`
+- 普通 `data-loading='get::disable::user/ownCompany'`
+- 使用方式，在 index.html 中提前加载 `dom-loading.js` 文件即可
+
+
 ### 完结撒花，感谢阅读。
 ![](http://upyun.luckly-mjw.cn/Assets/click-constraint/006.jpeg)
 
