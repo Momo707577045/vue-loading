@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="keywords" content="click constraint for web">
+  <meta name="description" content="click constraint for web, Momo's Blog, LuckyMomo">
+  <title>Click Constraint 点击约束</title>
+  <style>
+  /*外链代码*/
+  .m-p-other, .m-p-github {
+    position: fixed;
+    right: 50px;
+    background-color: #eff3f6;
+    background-image: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
+    color: #24292e;
+    border: 1px solid rgba(27, 31, 35, .2);
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    padding: 6px 12px;
+    z-index: 99;
+  }
+  .m-p-help {
+    position: fixed;
+    right: 50px;
+    top: 50px;
+    width: 30px;
+    height: 30px;
+    color: #666666;
+    z-index: 2;
+    line-height: 30px;
+    text-align: center;
+    font-weight: bolder;
+    border-radius: 50%;
+    border: 1px solid rgba(27, 31, 35, .2);
+    cursor: pointer;
+    background-color: #eff3f6;
+    background-image: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
+  }
+  .m-p-github:hover, .m-p-other:hover, .m-p-help:hover {
+    opacity: 0.9;
+  }
+  .m-p-other {
+    bottom: 30px;
+  }
+  .m-p-github {
+    bottom: 70px;
+  }
+  /*功能代码*/
+  .title {
+    margin: 30px auto;
+    max-width: 1100px;
+    width: 100%;
+    font-size: 35px;
+    text-align: center;
+    font-weight: bold;
+  }
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid #eeeeee;
+    background-color: #3D8AC7;
+    opacity: 1;
+    transition: 0.3s all;
+  }
+  .content {
+    margin-top: 30px;
+    background-color: #fafafa;
+  }
+  .content table {
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+  }
+  .content th, td {
+    position: relative;
+    padding: 17px 10px;
+    border: 1px solid #E5E5E5;
+    box-sizing: border-box;
+    white-space: pre-line;
+  }
+  .content .empty {
+    padding: 30px 0;
+    font-size: 26px;
+    font-weight: bold;
+    text-align: center;
+  }
+  </style>
+</head>
+
+<body>
+<section class="title">点击约束解决方案示例</section>
+
+<section id="m-app">
+  <a class="m-p-help" target="_blank" href="https://segmentfault.com/a/1190000039831156">?</a>
+  <a class="m-p-github" target="_blank" href="https://github.com/Momo707577045/vue-loading">github</a>
+  <a class="m-p-other" target="_blank" href="http://blog.luckly-mjw.cn/tool-show/index.html">其他效率工具</a>
+
+  <div
+    class="btn ajaxSingleTest1"
+    data-loading="'get::loading::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1'"
+  >发送单个请求 loading</div>
+
+  <div
+    class="btn ajaxSingleTest2"
+    data-loading="'get::waiting::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1'"
+  >发送单个请求 waiting</div>
+
+  <div
+    class="btn ajaxSingleTest3"
+    data-loading="'get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1'"
+  >发送单个请求 disable</div>
+
+  <div
+    class="btn ajaxMultiTest"
+    data-loading="['get::loading::/mock/50/test/user/', 'get::/test/users?pageIndex=2']"
+  >发送多个请求</div>
+
+  <!--内容区添加数据加载中遮罩loading-->
+  <div
+    class="content"
+    data-loading="[
+      'get::waiting::/mock/50/test/user',
+      'get::/test/users?pageIndex=1',
+      'get::/test/users?pageIndex=2'
+    ]"
+  >
+    <table>
+      <thead>
+      <tr>
+        <th>id</th>
+        <th>姓名</th>
+        <th>性别</th>
+        <th>资产</th>
+        <th>工作编号</th>
+      </tr>
+      </thead>
+      <tbody v-if="dataList.length > 0">
+      <div class="content"></div>
+      </tbody>
+    </table>
+    <div class="empty" v-if="dataList.length===0">暂无数据</div>
+  </div>
+</section>
+</body>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?1f12b0865d866ae1b93514870d93ce89";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<!--请求库，不依赖特定库，这里只是做示例-->
+<script src="./dom-loading.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+
+<script>
+
+/// 请求单个接口
+function ajaxSingleTest() {
+  axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1').then(res => {
+    console.log(res)
+    // this.dataList = res.data.data.list
+  })
+}
+
+
+// 请求多个接口，直到请求全部触发完成，才消除 loading 样式
+function ajaxMultiTest() {
+  axios.get('http://yapi.luckly-mjw.cn/mock/50/test/user/321')
+  axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2').then(res => {
+    console.log(res)
+    // this.dataList = res.data.data.list
+  })
+}
+
+document.querySelector('.ajaxSingleTest1').addEventListener('click', ajaxSingleTest)
+document.querySelector('.ajaxSingleTest2').addEventListener('click', ajaxSingleTest)
+document.querySelector('.ajaxSingleTest3').addEventListener('click', ajaxSingleTest)
+document.querySelector('.ajaxMultiTest').addEventListener('click', ajaxMultiTest)
+</script>
+</html>
