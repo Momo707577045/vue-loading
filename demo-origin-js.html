@@ -10,7 +10,7 @@
   <title>Click Constraint 点击约束</title>
   <style>
   /*外链代码*/
-  .m-p-other, .m-p-github {
+  .m-p-other, .m-p-github, .m-p-vue {
     position: fixed;
     right: 50px;
     background-color: #eff3f6;
@@ -43,14 +43,17 @@
     background-color: #eff3f6;
     background-image: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
   }
-  .m-p-github:hover, .m-p-other:hover, .m-p-help:hover {
+  .m-p-github:hover, .m-p-other:hover, .m-p-help:hover, .m-p-vue:hover {
     opacity: 0.9;
   }
-  .m-p-other {
+  .m-p-vue {
     bottom: 30px;
   }
-  .m-p-github {
+  .m-p-other {
     bottom: 70px;
+  }
+  .m-p-github {
+    bottom: 110px;
   }
   /*功能代码*/
   .title {
@@ -77,23 +80,21 @@
     margin-top: 30px;
     background-color: #fafafa;
   }
-  .content table {
+  .result-box {
+    padding: 20px;
+    height: calc(100vh - 210px);
     width: 100%;
-    text-align: center;
-    border-collapse: collapse;
-  }
-  .content th, td {
-    position: relative;
-    padding: 17px 10px;
-    border: 1px solid #E5E5E5;
     box-sizing: border-box;
-    white-space: pre-line;
-  }
-  .content .empty {
-    padding: 30px 0;
-    font-size: 26px;
-    font-weight: bold;
-    text-align: center;
+    position: relative;
+    white-space: pre;
+    text-align: left;
+    color: #333333;
+    font-size: 14px;
+    overflow: auto;
+    resize: none;
+    border-radius: 4px;
+    border: 1px solid #bbbbbb;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   }
   </style>
 </head>
@@ -105,6 +106,7 @@
   <a class="m-p-help" target="_blank" href="https://segmentfault.com/a/1190000039831156">?</a>
   <a class="m-p-github" target="_blank" href="https://github.com/Momo707577045/vue-loading">github</a>
   <a class="m-p-other" target="_blank" href="http://blog.luckly-mjw.cn/tool-show/index.html">其他效率工具</a>
+  <a class="m-p-vue" target="_blank" href="http://blog.luckly-mjw.cn/tool-show/vue-loading/demo.html">VUE 自定义指令版</a>
 
   <div
     class="btn ajaxSingleTest1"
@@ -135,21 +137,7 @@
       'get::/test/users?pageIndex=2'
     ]"
   >
-    <table>
-      <thead>
-      <tr>
-        <th>id</th>
-        <th>姓名</th>
-        <th>性别</th>
-        <th>资产</th>
-        <th>工作编号</th>
-      </tr>
-      </thead>
-      <tbody v-if="dataList.length > 0">
-      <div class="content"></div>
-      </tbody>
-    </table>
-    <div class="empty" v-if="dataList.length===0">暂无数据</div>
+    <textarea class="result-box" readonly>暂无数据</textarea>
   </div>
 </section>
 </body>
@@ -163,26 +151,27 @@ var _hmt = _hmt || [];
 })();
 </script>
 <!--请求库，不依赖特定库，这里只是做示例-->
-<script src="./dom-loading.js"></script>
+<script src="https://blog.luckly-mjw.cn/tool-show/vue-loading/dom-loading.js"></script>
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
 
 <script>
+const resultDom = document.querySelector('.result-box')
+
 
 /// 请求单个接口
 function ajaxSingleTest() {
   axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1').then(res => {
     console.log(res)
-    // this.dataList = res.data.data.list
+    resultDom.value = JSON.stringify(res.data.data.list, null, 4)
   })
 }
-
 
 // 请求多个接口，直到请求全部触发完成，才消除 loading 样式
 function ajaxMultiTest() {
   axios.get('http://yapi.luckly-mjw.cn/mock/50/test/user/321')
   axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2').then(res => {
     console.log(res)
-    // this.dataList = res.data.data.list
+    resultDom.value = JSON.stringify(res.data.data.list, null, 4)
   })
 }
 
