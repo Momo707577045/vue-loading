@@ -55,7 +55,6 @@
           })
         }
       })
-      console.log(url)
       originOpen.call(realXHR, method, url)
     }
 
@@ -84,29 +83,30 @@
     /*cursor: not-allowed; 与 pointer-events: none 互斥，设置 pointer-events: none 后，设置鼠标样式无效 */
   }
   .v-waiting::before {
-    position: absolute;
-    content: '';
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.7;
-    z-index: 9999;
-    background-color: #ffffff;
+    position: absolute !important;
+    content: '' !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0.7 !important;
+    z-index: 9999 !important;
+    background-color: #ffffff !important;
   }
   .v-waiting-waiting::after {
-    position: absolute;
-    content: '数据加载中';
-    top: 50%;
-    left: 0;
-    width: 100%;
-    max-width: 100vw;
-    color: #666666;
-    font-size: 20px;
-    text-align: center;
-    transform: translateY(-50%);
-    z-index: 9999;
-    animation: v-waiting-v-waiting-keyframes 1.8s infinite linear;
+    position: absolute !important;
+    content: '数据加载中' !important;
+    top: 50% !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    color: #666666 !important;
+    font-size: 20px !important;
+    text-align: center !important;
+    opacity: 1 !important;
+    transform: translateY(-50%) !important;
+    z-index: 9999 !important;
+    animation: v-waiting-v-waiting-keyframes 1.8s infinite linear !important;
   }
    @-webkit-keyframes v-waiting-v-waiting-keyframes {
     20% {
@@ -123,18 +123,20 @@
     }
   }  
   .v-waiting-loading::after {
-    position: absolute;
-    content: '';
-    left: 50%;
-    top: 50%;
-    width: 30px;
-    height: 30px;
-    z-index: 9999;
-    cursor: not-allowed;
-    animation: v-waiting-v-loading-keyframes 1.1s infinite linear;
-    background-position: center;
-    background-size: 30px 30px;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAWlBMVEUAAABmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZJqDNWAAAAHXRSTlMAgOKKPykV1K5JDbIf9OzNvGHGpZ5lNi8Hl3RVbc989bAAAAE8SURBVEjH5ZRZcsMgEEQR2li0WbuXvv81k5ARTllAQZV/Un5fAnWbYdwj9iaKXM9Zgr7EDzxav9cw5LGGB4gq0iBArEFZtTb0lIEoQ3oNoN/MoyQ93wP62lb9rOnil9sqxO9y4YCW9mXfnxo2gVC0sannyxZoq9MN/PdsXPs56WtPm8dTT8lwYy5W6YiPadOdxbM/RL6x/4sqk+SNBupb0jxS0sLITNp5NJhlOJ4ZJSVmgiub/gLEENKTrPh7QvjaqgPQmcyPMLSBXFDYaup+fZwWRhXKNmDsppJ9InLu9JKgzwL/9jLPp2iu8Gf2jm+ml80rGbg7ducPygCi8MQOmfuEznuCfLkXGa40tTkf7E/mVKuzJtLT4nBw7piuS9/abXGUHQuHQaQapmiDTiyJWt8rFu8YWy4q9g6+AGYbJ4l/4YQUAAAAAElFTkSuQmCC);
+    position: absolute !important;
+    content: '' !important;
+    left: 50% !important;
+    top: 50% !important;
+    width: 30px !important;
+    height: 30px !important;
+    z-index: 9999 !important;
+    opacity: 1 !important;
+    cursor: not-allowed !important;
+    animation: v-waiting-v-loading-keyframes 1.1s infinite linear !important;
+    background-position: center !important;
+    background-size: 30px 30px !important;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAWlBMVEUAAABmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZJqDNWAAAAHXRSTlMAgOKKPykV1K5JDbIf9OzNvGHGpZ5lNi8Hl3RVbc989bAAAAE8SURBVEjH5ZRZcsMgEEQR2li0WbuXvv81k5ARTllAQZV/Un5fAnWbYdwj9iaKXM9Zgr7EDzxav9cw5LGGB4gq0iBArEFZtTb0lIEoQ3oNoN/MoyQ93wP62lb9rOnil9sqxO9y4YCW9mXfnxo2gVC0sannyxZoq9MN/PdsXPs56WtPm8dTT8lwYy5W6YiPadOdxbM/RL6x/4sqk+SNBupb0jxS0sLITNp5NJhlOJ4ZJSVmgiub/gLEENKTrPh7QvjaqgPQmcyPMLSBXFDYaup+fZwWRhXKNmDsppJ9InLu9JKgzwL/9jLPp2iu8Gf2jm+ml80rGbg7ducPygCi8MQOmfuEznuCfLkXGa40tTkf7E/mVKuzJtLT4nBw7piuS9/abXGUHQuHQaQapmiDTiyJWt8rFu8YWy4q9g6+AGYbJ4l/4YQUAAAAAElFTkSuQmCC) !important;
+
   }
   @-webkit-keyframes v-waiting-v-loading-keyframes {
     from {
