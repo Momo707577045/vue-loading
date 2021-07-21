@@ -109,9 +109,14 @@
   <a class="m-p-vue" target="_blank" href="http://blog.luckly-mjw.cn/tool-show/vue-loading/demo.html">VUE 自定义指令版</a>
 
   <div
-    class="btn ajaxSingleTest1"
+    class="btn ajaxStrictTest"
+    data-loading="'get::loading::http://yapi.luckly-mjw.cn/mock/\\d+/test/$'"
+  >正则匹配，精确匹配，单个请求 loading</div>
+
+  <div
+    class="btn ajaxNumTest"
     data-loading="'get::loading::http://yapi.luckly-mjw.cn/mock/\\d+/test/users'"
-  >正则匹配，发送单个请求 loading</div>
+  >正则匹配，匹配数值，发送单个请求 loading</div>
 
   <div
     class="btn ajaxSingleTest1"
@@ -126,7 +131,6 @@
   <div
     class="btn ajaxSingleTest3"
     data-loading="'get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1'"
-    data-loading="get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1"
   >发送单个请求 disable</div>
 
   <div
@@ -163,6 +167,13 @@ var _hmt = _hmt || [];
 <script>
 const resultDom = document.querySelector('.result-box')
 
+/// 正则精确匹配单个接口
+function ajaxSingleStrictTest() {
+  axios.get('http://yapi.luckly-mjw.cn/mock/50/test/').then(res => {
+    console.log(res)
+    resultDom.value = JSON.stringify(res.data.data.list, null, 4)
+  })
+}
 
 /// 请求单个接口
 function ajaxSingleTest() {
@@ -181,6 +192,8 @@ function ajaxMultiTest() {
   })
 }
 
+document.querySelector('.ajaxStrictTest').addEventListener('click', ajaxSingleStrictTest)
+document.querySelector('.ajaxNumTest').addEventListener('click', ajaxSingleTest)
 document.querySelector('.ajaxSingleTest1').addEventListener('click', ajaxSingleTest)
 document.querySelector('.ajaxSingleTest2').addEventListener('click', ajaxSingleTest)
 document.querySelector('.ajaxSingleTest3').addEventListener('click', ajaxSingleTest)

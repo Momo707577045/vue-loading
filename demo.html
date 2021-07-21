@@ -112,9 +112,15 @@
 
   <div
     class="btn"
+    v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/\\d+/test/$'"
+    @click="ajaxSingleStrictTest"
+  >正则匹配，精确匹配，单个请求 loading</div>
+
+  <div
+    class="btn"
     v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/\\d+/test/users'"
     @click="ajaxSingleTest"
-  >正则匹配，发送单个请求 loading</div>
+  >正则匹配，匹配数值，发送单个请求 loading</div>
 
   <div
     class="btn"
@@ -382,6 +388,14 @@ new Vue({
   },
 
   methods: {
+    /// 正则精确匹配单个接口
+    ajaxSingleStrictTest() {
+      axios.get('http://yapi.luckly-mjw.cn/mock/50/test/').then(res => {
+        console.log(res)
+        this.dataList = res.data.data.list
+      })
+    },
+
     // 请求单个接口
     ajaxSingleTest() {
       axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1').then(res => {

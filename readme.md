@@ -16,6 +16,7 @@
   - 兼容性强，不依赖第三方库，~~vue 技术盏项目均可接入。~~ 与技术盏无关，前端项目均可使用。
   - 实现原理简单，代码无加密，无混淆。根据业务需求可以进行定制化样式调整。
   - 除点击约束外，还可实现内容区的 loading 遮罩效果。
+  - 支持正则匹配，实现数值匹配，精准匹配等功能
 
    ![](http://upyun.luckly-mjw.cn/Assets/click-constraint/004.jpeg)
 
@@ -44,8 +45,11 @@
     - loading 样式将在接口调用时显示，直到发起请求的所有接口请求均调用完成，才消除。
     - 未发起请求的接口，即使写在数组里面，也不会影响。
     - 数组的第二条数据，没有指定第二个参数的 loading 样式，该参数是可选的，默认样式为「waiting」
+- ajax 路径正则匹配
+  - 【数值匹配】「/mock/\\\\d+/test/users」，其中「\\\\d+」为匹配多个数值，「/mock/\\\\d+/test/users」可匹配「/mock/50/test/users」
+  - 【精确匹配】通过在结尾添加「$」标识结束，如「/mock/50/test$」将忽略 「/mock/50/test/users」的匹配。只有「/mock/50/test」才会命中匹配
 
- ![](http://upyun.luckly-mjw.cn/Assets/click-constraint/007.jpeg)
+  ![](http://upyun.luckly-mjw.cn/Assets/click-constraint/007.jpeg)
 
 
 ### VUE 自定义指令版，使用方式（仅需两步）
@@ -246,7 +250,11 @@ Vue.directive('waiting', {
     - 未发起请求的接口，即使写在数组里面，也不会影响。
     - 数组的第二条数据，没有指定第二个参数的 loading 样式，该参数是可选的，默认样式为「waiting」
 
- ![](http://upyun.luckly-mjw.cn/Assets/click-constraint/002.jpeg)
+- ajax 路径正则匹配
+  - 【数值匹配】「/mock/\\\\d+/test/users」，其中「\\\\d+」为匹配多个数值，「/mock/\\\\d+/test/users」可匹配「/mock/50/test/users」
+  - 【精确匹配】通过在结尾添加「$」标识结束，如「/mock/50/test$」将忽略 「/mock/50/test/users」的匹配。只有「/mock/50/test」才会命中匹配
+
+  ![](http://upyun.luckly-mjw.cn/Assets/click-constraint/002.jpeg)
 
 
 ### 实现原理
