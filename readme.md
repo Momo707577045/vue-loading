@@ -37,6 +37,7 @@
     - 其中「get」表示监听的接口请求类型
     - 「loading」 标识点击约束时的 loading 样式。一种有三种，分别是「loading」「waiting」「disabled」。可以不填，默认为「waiting」。
     - 「/mock/50/test/users」标识需要监听的接口名，本质是通过`url.indexOf(targetUrl)`，indexOf 来进行字符串匹配。
+    - 支持数字正则匹配，「/mock/\\\\d+/test/users」等价于「/mock/50/test/users」
   - 监听多个请求
     - `<div data-loading="['get::waiting::/test/users?pageIndex=2', 'get::/test/users?pageIndex=1']"></div>`
     - 通过数组形式，传入多个需要监听的请求。
@@ -77,7 +78,10 @@ Vue.directive('waiting', {
             } else { // 指定类型
               type = `v-waiting-${type}`
             }
-            if (targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase() && url.indexOf(targetUrl) > -1) {
+           if (
+             targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase()
+             && (url.indexOf(targetUrl) > -1 || new RegExp(targetUrl).test(url))
+           ) {
               targetDomList = [...window.waitingAjaxMap[key], ...targetDomList]
               window.waitingAjaxMap[key].forEach(dom => {
                 if (!dom.classList.contains(type)) {
@@ -234,6 +238,7 @@ Vue.directive('waiting', {
     - 其中「get」表示监听的接口请求类型
     - 「loading」 标识点击约束时的 loading 样式。一种有三种，分别是「loading」「waiting」「disabled」。可以不填，默认为「waiting」。
     - 「/mock/50/test/users」标识需要监听的接口名，本质是通过`url.indexOf(targetUrl)`，indexOf 来进行字符串匹配。
+    - 支持数字正则匹配，「/mock/\\\\d+/test/users」等价于「/mock/50/test/users」
   - 监听多个请求
     - `<div v-waiting="['get::waiting::/test/users?pageIndex=2', 'get::/test/users?pageIndex=1']" @click="test"></div>`
     - 通过数组形式，传入多个需要监听的请求。
@@ -280,7 +285,9 @@ Vue.directive('waiting', {
       const domList = document.querySelectorAll('[data-loading]')
       Array.prototype.forEach.call(domList, targetDom => {
         targetDom.dataset.loading.split(',').forEach(targetUrl => {
-          targetUrl = targetUrl.replace(/['"[\]]/ig, '').trim()
+           targetUrl = targetUrl
+              .replace(/['"[\]]/ig, '') // 去除冗余字符
+              .replace(/\\\\/ig, '\\').trim() // 将双反斜杠转为单反斜杠，适配原生模式正则匹配
           window.waittingAjaxMap[targetUrl] = [targetDom, ...(window.waittingAjaxMap[targetUrl] || [])]
         })
       })
@@ -303,7 +310,10 @@ Vue.directive('waiting', {
         } else { // 指定类型
           type = `v-waiting-${type}`
         }
-        if (targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase() && url.indexOf(targetUrl) > -1) {
+         if (
+           targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase()
+           && (url.indexOf(targetUrl) > -1 || new RegExp(targetUrl).test(url))
+         ) {
           targetDomList = [...window.waittingAjaxMap[key], ...targetDomList]
           window.waittingAjaxMap[key].forEach(dom => {
             if (!dom.classList.contains(type)) {

@@ -30,7 +30,10 @@ Vue.directive('waiting', {
             } else { // 指定类型
               type = `v-waiting-${type}`
             }
-            if (targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase() && url.indexOf(targetUrl) > -1) {
+            if (
+              targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase()
+              && (url.indexOf(targetUrl) > -1 || new RegExp(targetUrl).test(url))
+            ) {
               targetDomList = [...window.waittingAjaxMap[key], ...targetDomList]
               window.waittingAjaxMap[key].forEach(dom => {
                 if (!dom.classList.contains(type)) {

@@ -110,7 +110,12 @@
 
   <div
     class="btn ajaxSingleTest1"
-    data-loading="'get::loading::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1'"
+    data-loading="'get::loading::http://yapi.luckly-mjw.cn/mock/\\d+/test/users'"
+  >正则匹配，发送单个请求 loading</div>
+
+  <div
+    class="btn ajaxSingleTest1"
+    data-loading="'get::loading::http://yapi.luckly-mjw.cn/mock/50/test/users'"
   >发送单个请求 loading</div>
 
   <div
@@ -121,6 +126,7 @@
   <div
     class="btn ajaxSingleTest3"
     data-loading="'get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1'"
+    data-loading="get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1"
   >发送单个请求 disable</div>
 
   <div
