@@ -5,8 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <meta name="keywords" content="click constraint for web">
-  <meta name="description" content="click constraint for web, Momo's Blog, LuckyMomo">
+  <meta name="author" content="毛静文,Momo">
+  <meta name="keywords" content="点击约束,毛静文的博客,Momo's Blog">
+  <meta name="description" content="点击约束,一劳永逸,点击约束：某个按钮触发一次点击后，待接口调用有结果都才能再次触发。避免用户多次点击，触发多次接口调用。">
   <title>Click Constraint 点击约束</title>
   <style>
   /*外链代码*/
@@ -103,7 +104,15 @@
 
 <body>
 <section class="title">点击约束解决方案示例</section>
-
+<body>
+<div id="loading">
+  页面加载中，请耐心等待...
+  <h1 style="white-space: pre;">
+    推荐一个点击约束解决方案，一劳永逸，
+    点击约束：某个按钮触发一次点击后，待接口调用有结果都才能再次触发。避免用户多次点击，触发多次接口调用。
+    工具链接：https://blog.luckly-mjw.cn/tool-show/vue-loading/index.html
+  </h1>
+</div>
 <section id="m-app" v-cloak>
   <a class="m-p-help" target="_blank" href="https://segmentfault.com/a/1190000039831156">?</a>
   <a class="m-p-github" target="_blank" href="https://github.com/Momo707577045/vue-loading">github</a>
@@ -194,6 +203,7 @@ var _hmt = _hmt || [];
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
 
 <script>
+document.getElementById('loading') && document.getElementById('loading').remove()
 /** 核心代码，监听 ajax，自动为匹配到的 dom 元素添加点击约束  **/
 // eslint-disable-next-line
 // <div id="1" v-waiting="['get::waiting::/test/users?pageIndex=2', 'get::/test/users?pageIndex=1']" @click="test"></div>
