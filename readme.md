@@ -26,10 +26,10 @@
 ### [架构无关，原生 JS版 在线示例](http://blog.luckly-mjw.cn/tool-show/vue-loading/demo-origin-js.html)
 - 页面源码，通过控制台查看即可
 
-### [VUE2 + Element UI 定制版](http://blog.luckly-mjw.cn/tool-show/vue-loading/demo.html)
+### [VUE2 + Element UI 定制版](https://github.com/Momo707577045/vue-loading/blob/master/source-code-for-vue2-element.js)
 - 使用 Element UI 默认样式，更加美观大方
 
-### [VUE3 + Element Plus 定制版](http://blog.luckly-mjw.cn/tool-show/vue-loading/demo-origin-js.html)
+### [VUE3 + Element Plus 定制版](https://github.com/Momo707577045/vue-loading/blob/master/source-code-for-vue3-element-plus.js)
 - 使用 Element Plus 默认样式，更加美观大方
 
 ### 原生 JS 版，使用方式（仅需两步）
