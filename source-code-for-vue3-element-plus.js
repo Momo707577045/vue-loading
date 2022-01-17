@@ -1,8 +1,6 @@
 // VUE3 Element plus 定制版，使用原生 Element 样式
-
 /* eslint-disable no-underscore-dangle */
 // 监听 ajax请求，自动为匹配到的 dom 元素添加点击约束
-import { createApp } from 'vue'
 import { ElLoading } from 'element-plus'
 
 /**
@@ -23,6 +21,8 @@ import { ElLoading } from 'element-plus'
  >点击</div>
  */
 // 样式是参考 element 的Loading 组件 https://element.eleme.cn/#/zh-CN/component/loading，做一些二次开发修改
+
+let minMillisecondTimeForShow = 200 // 最小显示的毫秒时间，避免加载中样式一闪而过，没有充分显示
 export default {
   install(app) {
     // 注入全局方法
@@ -53,7 +53,7 @@ export default {
               targetDomList = [...window.waitingAjaxMap[key], ...targetDomList]
               window.waitingAjaxMap[key].forEach(dom => {
                 if (dom && dom.type === 'button') { // 如果当前是一个按钮，则使用自带loading效果
-                  dom.__vnodeForWaiting.ref.i.props.loading = true
+                  dom.vnodeForWaiting.ref.i.props.loading = true
                 } else { // 否则使用 element 的 loading 组件
                   dom.ElLoading = ElLoading.service({
                     target: dom,
@@ -62,6 +62,9 @@ export default {
                     background: dom.getAttribute('element-loading-background'),
                     customClass: dom.getAttribute('element-loading-custom-class'),
                   })
+                }
+                if (!dom.waitingAjaxNum) {
+                  dom.showStartTime = new Date().getTime() // 该 dom 显示加载中的开始时间
                 }
                 dom.waitingAjaxNum = dom.waitingAjaxNum || 0 // 不使用 dataset，是应为 dataset 并不实时，在同一个时间内，上一次存储的值不能被保存
                 dom.waitingAjaxNum++
@@ -77,11 +80,17 @@ export default {
           targetDomList.forEach(dom => {
             dom.waitingAjaxNum--
             if (dom.waitingAjaxNum !== 0) return
-            if (dom && dom.type === 'button') {
-              dom.__vnodeForWaiting.ref.i.props.loading = false
-            } else {
-              dom.ElLoading.close()
+            let showEndTime = new Date().getTime() // 该 dom 显示加载中样式的结束时间
+            let showTime = showEndTime - dom.showStartTime // 该 dom 显示加载中样式的时长
+            let remainShowTime = minMillisecondTimeForShow - showTime // 剩余需要显示加载中样式的时长
+            let closeWaiting = () => {
+              if (dom && dom.type === 'button') {
+                dom.vnodeForWaiting.ref.i.props.loading = false
+              } else {
+                dom.ElLoading.close()
+              }
             }
+            remainShowTime > 0 ? setTimeout(closeWaiting, remainShowTime) : closeWaiting() // 是否仍需要额外显示加载中样式，是则设置 setTimeout 延后再取消加载中样式
           })
         }, false)
         return realXHR
@@ -91,9 +100,7 @@ export default {
     app.directive('waiting', {
       beforeMount: (targetDom, binding, vnode) => {
         // vue3 生产环境中，__vnode 会被隐藏，需要通过开发手动挂载
-        targetDom.__vnodeForWaiting = targetDom.__vnode || vnode
-
-        // 添加需要监听的接口，注入对应的 dom
+        targetDom.vnodeForWaiting = targetDom.__vnode || vnode
         const targetUrlList = Array.isArray(binding.value) ? binding.value : [binding.value]
         targetUrlList.forEach(targetUrl => {
           window.waitingAjaxMap[targetUrl] = [targetDom, ...(window.waitingAjaxMap[targetUrl] || [])]
@@ -103,8 +110,7 @@ export default {
       // 参数变化
       update: (targetDom, binding, vnode) => {
         // vue3 生产环境中，__vnode 会被隐藏，需要通过开发手动挂载
-        targetDom.__vnodeForWaiting = targetDom.__vnode || vnode
-
+        targetDom.vnodeForWaiting = targetDom.__vnode || vnode
         if (binding.oldValue !== binding.value) {
           const preTargetUrlList = Array.isArray(binding.oldValue) ? binding.oldValue : [binding.oldValue]
           preTargetUrlList.forEach(targetUrl => {
