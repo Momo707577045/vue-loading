@@ -23,74 +23,84 @@ import { Loading as ElLoading } from '@bihu/element-ui'
  */
 
 // 样式是参考element 的Loading 组件 https://element.eleme.cn/#/zh-CN/component/loading，做一些二次开发修改
+let minMillisecondTimeForShow = 200 // 最小显示的毫秒时间，避免加载中样式一闪而过，没有充分显示
 const waitingDirective = {}
 waitingDirective.install = v => {
-  v.directive('waiting', {
-    bind: (targetDom, binding) => {
 
-      // 注入全局方法
-      (function() {
-        // 如果已经重置过，则不再进入。解决开发时局部刷新导致重新加载问题
-        if (window.hadResetAjaxForWaiting) {
-          return
-        }
-        window.hadResetAjaxForWaiting = true
-        window.waitingAjaxMap = {} // 接口映射 {'get::http://www.baidu.com/mock/50/test/users?pageIndex=1': dom}
+  // 注入全局方法
+  (function() {
+    // 如果已经重置过，则不再进入。解决开发时局部刷新导致重新加载问题
+    if (window.hadResetAjaxForWaiting) {
+      return
+    }
+    window.hadResetAjaxForWaiting = true
+    window.waitingAjaxMap = {} // 接口映射 {'get::http://www.baidu.com/mock/50/test/users?pageIndex=1': dom}
 
-        // 保存一份原生的 XMLHttpRequest 对象 和 open 方法
-        let OriginXHR = window.XMLHttpRequest
-        let originOpen = OriginXHR.prototype.open
+    // 保存一份原生的 XMLHttpRequest 对象 和 open 方法
+    let OriginXHR = window.XMLHttpRequest
+    let originOpen = OriginXHR.prototype.open
 
-        // 重置 XMLHttpRequest
-        window.XMLHttpRequest = function() {
-          let targetDomList = [] // 存储 ajax 请求，影响到的 dom 元素
-          let realXHR = new OriginXHR() // 实例化出一份新的 XMLHttpRequest对象，来进行重载
+    // 重置 XMLHttpRequest
+    window.XMLHttpRequest = function() {
+      let targetDomList = [] // 存储 ajax 请求，影响到的 dom 元素
+      let realXHR = new OriginXHR() // 实例化出一份新的 XMLHttpRequest对象，来进行重载
 
-          realXHR.open = function(method, url, async) {
-            Object.keys(window.waitingAjaxMap).forEach(key => {
-              let [targetMethod, type, targetUrl] = key.split('::')
-              if (!targetUrl) {
-                targetUrl = type
-              }
-              if (targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase() && (url.indexOf(targetUrl) > -1 || new RegExp(targetUrl).test(url))) {
-                targetDomList = [...window.waitingAjaxMap[key], ...targetDomList]
-                window.waitingAjaxMap[key].forEach(dom => {
-                  if (dom && dom.type === 'button') { // 如果当前是一个按钮，则使用自带loading效果
-                    dom.__vue__.vWaiting = true
-                  } else { // 否则使用 element 的 loading 组件
-                    dom.ElLoading = ElLoading.service({
-                      target: dom,
-                      text: dom.getAttribute('element-loading-text'),
-                      spinner: dom.getAttribute('element-loading-spinner'),
-                      background: dom.getAttribute('element-loading-background'),
-                      customClass: dom.getAttribute('element-loading-custom-class'),
-                    })
-                  }
-                  dom.waitingAjaxNum = dom.waitingAjaxNum || 0 // 不使用 dataset，是应为 dataset 并不实时，在同一个时间内，上一次存储的值不能被保存
-                  dom.waitingAjaxNum++
+      realXHR.open = function(method, url, async) {
+        Object.keys(window.waitingAjaxMap).forEach(key => {
+          let [targetMethod, type, targetUrl] = key.split('::')
+          if (!targetUrl) {
+            targetUrl = type
+          }
+          if (targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase() && (url.indexOf(targetUrl) > -1 || new RegExp(targetUrl).test(url))) {
+            targetDomList = [...window.waitingAjaxMap[key], ...targetDomList]
+            window.waitingAjaxMap[key].forEach(dom => {
+              if (dom && dom.type === 'button') { // 如果当前是一个按钮，则使用自带loading效果
+                dom.__vue__.vWaiting = true
+              } else { // 否则使用 element 的 loading 组件
+                dom.ElLoading = ElLoading.service({
+                  target: dom,
+                  text: dom.getAttribute('element-loading-text'),
+                  spinner: dom.getAttribute('element-loading-spinner'),
+                  background: dom.getAttribute('element-loading-background'),
+                  customClass: dom.getAttribute('element-loading-custom-class'),
                 })
               }
-            })
-            // 使用原生的 XMLHttpRequest open操作
-            originOpen.call(realXHR, method, url, async)
-          }
-
-          // 监听加载完成，清除 waiting
-          realXHR.addEventListener('loadend', () => {
-            targetDomList.forEach(dom => {
-              dom.waitingAjaxNum--
-              if (dom.waitingAjaxNum !== 0) return
-              if (dom && dom.type === 'button') {
-                dom.__vue__.vWaiting = false
-              } else {
-                dom.ElLoading.close()
+              if (!dom.waitingAjaxNum) {
+                dom.showStartTime = new Date().getTime() // 该 dom 显示加载中的开始时间
               }
+              dom.waitingAjaxNum = dom.waitingAjaxNum || 0 // 不使用 dataset，是应为 dataset 并不实时，在同一个时间内，上一次存储的值不能被保存
+              dom.waitingAjaxNum++
             })
-          }, false)
-          return realXHR
-        }
-      })()
+          }
+        })
+        // 使用原生的 XMLHttpRequest open操作
+        originOpen.call(realXHR, method, url, async)
+      }
 
+      // 监听加载完成，清除 waiting
+      realXHR.addEventListener('loadend', () => {
+        targetDomList.forEach(dom => {
+          dom.waitingAjaxNum--
+          if (dom.waitingAjaxNum !== 0) return
+          let showEndTime = new Date().getTime() // 该 dom 显示加载中样式的结束时间
+          let showTime = showEndTime - dom.showStartTime // 该 dom 显示加载中样式的时长
+          let remainShowTime = minMillisecondTimeForShow - showTime // 剩余需要显示加载中样式的时长
+          let closeWaiting = () => {
+            if (dom && dom.type === 'button') {
+              dom.__vue__.vWaiting = false
+            } else {
+              dom.ElLoading.close()
+            }
+          }
+          remainShowTime > 0 ? setTimeout(closeWaiting, remainShowTime) : closeWaiting() // 是否仍需要额外显示加载中样式，是则设置 setTimeout 延后再取消加载中样式
+        })
+      }, false)
+      return realXHR
+    }
+  })()
+
+  v.directive('waiting', {
+    bind: (targetDom, binding) => {
       // 添加需要监听的接口，注入对应的 dom
       const targetUrlList = Array.isArray(binding.value) ? binding.value : [binding.value]
       targetUrlList.forEach(targetUrl => {
