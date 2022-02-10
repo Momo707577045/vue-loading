@@ -155,7 +155,10 @@
     @click="ajaxMultiTest"
   >发送多个请求</div>
 
-  <div class="btn" v-waiting="importAxiosFun" @click="ajaxFromImport">传递请求函数</div>
+  <div class="btn"
+      v-waiting="importAxiosFun"
+      @click="ajaxFromImport"
+  >传递请求函数 {{ importAxiosFun }}</div>
 
   <!--内容区添加数据加载中遮罩loading-->
   <div
@@ -202,7 +205,7 @@ var _hmt = _hmt || [];
 <!--vue 前端框架-->
 <script src="./vue.js"></script>
 <!--请求库，不依赖特定库，这里只是做示例-->
-<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script src="./axios.min.js"></script>
 <script>
 document.getElementById('loading') && document.getElementById('loading').remove()
 
