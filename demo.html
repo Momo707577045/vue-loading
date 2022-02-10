@@ -155,6 +155,8 @@
     @click="ajaxMultiTest"
   >发送多个请求</div>
 
+  <div class="btn" v-waiting="importAxiosFun" @click="ajaxFromImport">传递请求函数</div>
+
   <!--内容区添加数据加载中遮罩loading-->
   <div
     class="content"
@@ -198,17 +200,39 @@ var _hmt = _hmt || [];
 })();
 </script>
 <!--vue 前端框架-->
-<script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+<script src="./vue.js"></script>
 <!--请求库，不依赖特定库，这里只是做示例-->
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
-
 <script>
 document.getElementById('loading') && document.getElementById('loading').remove()
+
 /** 核心代码，监听 ajax，自动为匹配到的 dom 元素添加点击约束  **/
 // eslint-disable-next-line
 // <div id="1" v-waiting="['get::waiting::/test/users?pageIndex=2', 'get::/test/users?pageIndex=1']" @click="test"></div>
 // <div id="2" v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2'" @click="test">copy</div>
 // <div id="3" v-waiting="'get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2'" @click="test">copy</div>
+// <div v-waiting="userApi.postLogin" @click="test1">兼容传入 axios 请求函数</div>
+
+// 兼容转换传入的函数，转化为 URL 字符串
+function cmptFunStrToUrl(targetList) {
+  targetList = Array.isArray(targetList) ? targetList : [targetList] // 兼容转化为数组
+  return targetList.map(targetItem => {
+    if (typeof targetItem === 'function') { // 如果传入的是函数
+      const funStr = targetItem.toString() // 将函数转化为字符串，进行解析
+      if (funStr === 'function () { [native code] }') {
+        throw new Error(`点击约束，因 Function.prototype.toString 限制，this 被 bind 修改过的函数无法解析, 请显式输入 url 字符串。 ${targetItem.name}，详情可参考 https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/toString`)
+      }
+      console.log(funStr)
+      const [, method, apiURL] = (funStr.match(/\.(get|post|delete|put|patch)\(['"`]([^'"`]+)/) || [])
+      if (!method || !apiURL) {
+        throw new Error(`点击约束，传入的函数解析失败, ${targetItem.name}`, funStr)
+      }
+      return `${method}::${apiURL}`
+    }
+    return targetItem
+  })
+}
+
 Vue.directive('waiting', {
   bind: (targetDom, binding) => {
     // 注入全局方法
@@ -239,7 +263,7 @@ Vue.directive('waiting', {
             if (
               targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase()
               && (url.indexOf(targetUrl) > -1 || new RegExp(targetUrl).test(url))
-            )  {
+            ) {
               targetDomList = [...window.waittingAjaxMap[key], ...targetDomList]
               window.waittingAjaxMap[key].forEach(dom => {
                 if (!dom.classList.contains(type)) {
@@ -352,7 +376,7 @@ Vue.directive('waiting', {
     })()
 
     // 添加需要监听的接口，注入对应的 dom
-    const targetUrlList = Array.isArray(binding.value) ? binding.value : [binding.value]
+    const targetUrlList = cmptFunStrToUrl(binding.value)
     targetUrlList.forEach(targetUrl => {
       window.waittingAjaxMap[targetUrl] = [targetDom, ...(window.waittingAjaxMap[targetUrl] || [])]
     })
@@ -361,7 +385,7 @@ Vue.directive('waiting', {
   // 参数变化
   update: (targetDom, binding) => {
     if (binding.oldValue !== binding.value) {
-      const preTargetUrlList = Array.isArray(binding.oldValue) ? binding.oldValue : [binding.oldValue]
+      const preTargetUrlList = cmptFunStrToUrl(binding.oldValue)
       preTargetUrlList.forEach(targetUrl => {
         const index = (window.waittingAjaxMap[targetUrl] || []).indexOf(targetDom)
         index > -1 && window.waittingAjaxMap[targetUrl].splice(index, 1)
@@ -377,7 +401,7 @@ Vue.directive('waiting', {
 
   // 指令被卸载，消除消息监听
   unbind: (targetDom, binding) => {
-    const targetUrlList = typeof binding.value === 'object' ? binding.value : [binding.value]
+    const targetUrlList = cmptFunStrToUrl(binding.value)
     targetUrlList.forEach(targetUrl => {
       const index = window.waittingAjaxMap[targetUrl].indexOf(targetDom)
       index > -1 && window.waittingAjaxMap[targetUrl].splice(index, 1)
@@ -388,16 +412,30 @@ Vue.directive('waiting', {
   }
 })
 
+// 外部 import 进来的 axios 请求配置
+function importAxiosFun() {
+  return axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1')
+}
+
 new Vue({
   el: '#m-app',
 
   data() {
     return {
       dataList: [],
+      importAxiosFun, // 定义同名变量，暴露到 vue 模板中
     }
   },
 
   methods: {
+    // 调用外部 axios 配置函数
+    ajaxFromImport(){
+      importAxiosFun().then(res => {
+        console.log(res)
+        this.dataList = res.data.data.list
+      })
+    },
+
     /// 正则精确匹配单个接口
     ajaxSingleStrictTest() {
       axios.get('http://yapi.luckly-mjw.cn/mock/50/test/').then(res => {

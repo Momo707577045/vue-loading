@@ -61,6 +61,32 @@
 ### VUE 自定义指令版，使用方式（仅需两步）
 - 注册全局自定义指令（代码量较少，且应对样式进行定制性调整。故不提供 npm 包，直接拷贝代码即可）
 ```
+/** 核心代码，监听 ajax，自动为匹配到的 dom 元素添加点击约束  **/
+// eslint-disable-next-line
+// <div id="1" v-waiting="['get::waiting::/test/users?pageIndex=2', 'get::/test/users?pageIndex=1']" @click="test"></div>
+// <div id="2" v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2'" @click="test">copy</div>
+// <div id="3" v-waiting="'get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2'" @click="test">copy</div>
+// <div v-waiting="userApi.postLogin" @click="test1">兼容传入 axios 请求函数</div>
+
+// 兼容转换传入的函数，转化为 URL 字符串
+function cmptFunStrToUrl(targetList) {
+  targetList = Array.isArray(targetList) ? targetList : [targetList] // 兼容转化为数组
+  return targetList.map(targetItem => {
+    if (typeof targetItem === 'function') { // 如果传入的是函数
+      const funStr = targetItem.toString() // 将函数转化为字符串，进行解析
+      if (funStr === 'function () { [native code] }') {
+        throw new Error(`点击约束，因 Function.prototype.toString 限制，this 被 bind 修改过的函数无法解析, 请显式输入 url 字符串。 ${targetItem.name}，详情可参考 https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/toString`)
+      }
+      const [, method, apiURL] = (funStr.match(/\.(get|post|delete|put|patch)\(['"`]([^'"`]+)/) || [])
+      if (!method || !apiURL) {
+        throw new Error(`点击约束，传入的函数解析失败, ${targetItem.name}`)
+      }
+      return `${method}::${apiURL}`
+    }
+    return targetItem
+  })
+}
+
 Vue.directive('waiting', {
   bind: (targetDom, binding) => {
     // 注入全局方法
@@ -69,7 +95,7 @@ Vue.directive('waiting', {
         return
       }
       window.hadResetAjaxForWaiting = true
-      window.waitingAjaxMap = {} // 接口映射
+      window.waittingAjaxMap = {} // 接口映射 'get::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1': dom
 
       let OriginXHR = window.XMLHttpRequest
       let originOpen = OriginXHR.prototype.open
@@ -80,7 +106,7 @@ Vue.directive('waiting', {
         let realXHR = new OriginXHR() // 重置操作函数，获取请求数据
 
         realXHR.open = function(method, url, asyn) {
-          Object.keys(window.waitingAjaxMap).forEach(key => {
+          Object.keys(window.waittingAjaxMap).forEach(key => {
             let [targetMethod, type, targetUrl] = key.split('::')
             if (!targetUrl) { // 设置默认类型
               targetUrl = type
@@ -88,12 +114,12 @@ Vue.directive('waiting', {
             } else { // 指定类型
               type = `v-waiting-${type}`
             }
-           if (
-             targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase()
-             && (url.indexOf(targetUrl) > -1 || new RegExp(targetUrl).test(url))
-           ) {
-              targetDomList = [...window.waitingAjaxMap[key], ...targetDomList]
-              window.waitingAjaxMap[key].forEach(dom => {
+            if (
+              targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase()
+              && (url.indexOf(targetUrl) > -1 || new RegExp(targetUrl).test(url))
+            ) {
+              targetDomList = [...window.waittingAjaxMap[key], ...targetDomList]
+              window.waittingAjaxMap[key].forEach(dom => {
                 if (!dom.classList.contains(type)) {
                   dom.classList.add('v-waiting', type)
                   if (window.getComputedStyle(dom).position === 'static') { // 如果是 static 定位，则修改为 relative，为伪类的绝对定位做准备
@@ -204,25 +230,32 @@ Vue.directive('waiting', {
     })()
 
     // 添加需要监听的接口，注入对应的 dom
-    const targetUrlList = Array.isArray(binding.value) ? binding.value : [binding.value]
+    /*
+      postLogin(body) {
+        return api.post('/api/operation/user/login', body)
+      }
+      则传入 postLogin，会自动解析该函数的配置
+      <div v-waiting="userApi.postLogin" @click="test1">兼容传入 axios 请求函数</div>
+    */
+    const targetUrlList = cmptFunStrToUrl(binding.value)
     targetUrlList.forEach(targetUrl => {
-      window.waitingAjaxMap[targetUrl] = [targetDom, ...(window.waitingAjaxMap[targetUrl] || [])]
+      window.waittingAjaxMap[targetUrl] = [targetDom, ...(window.waittingAjaxMap[targetUrl] || [])]
     })
   },
 
   // 参数变化
   update: (targetDom, binding) => {
     if (binding.oldValue !== binding.value) {
-      const preTargetUrlList = Array.isArray(binding.oldValue) ? binding.oldValue : [binding.oldValue]
+      const preTargetUrlList = cmptFunStrToUrl(binding.oldValue)
       preTargetUrlList.forEach(targetUrl => {
-        const index = (window.waitingAjaxMap[targetUrl] || []).indexOf(targetDom)
-        index > -1 && window.waitingAjaxMap[targetUrl].splice(index, 1)
+        const index = (window.waittingAjaxMap[targetUrl] || []).indexOf(targetDom)
+        index > -1 && window.waittingAjaxMap[targetUrl].splice(index, 1)
       })
 
       // 添加需要监听的接口，注入对应的 dom
-      const targetUrlList = Array.isArray(binding.value) ? binding.value : [binding.value]
+      const targetUrlList = cmptFunStrToUrl(binding.value)
       targetUrlList.forEach(targetUrl => {
-        window.waitingAjaxMap[targetUrl] = [targetDom, ...(window.waitingAjaxMap[targetUrl] || [])]
+        window.waittingAjaxMap[targetUrl] = [targetDom, ...(window.waittingAjaxMap[targetUrl] || [])]
       })
     }
   },
@@ -231,14 +264,15 @@ Vue.directive('waiting', {
   unbind: (targetDom, binding) => {
     const targetUrlList = typeof binding.value === 'object' ? binding.value : [binding.value]
     targetUrlList.forEach(targetUrl => {
-      const index = window.waitingAjaxMap[targetUrl].indexOf(targetDom)
-      index > -1 && window.waitingAjaxMap[targetUrl].splice(index, 1)
-      if (window.waitingAjaxMap[targetUrl].length === 0) {
-        delete window.waitingAjaxMap[targetUrl]
+      const index = window.waittingAjaxMap[targetUrl].indexOf(targetDom)
+      index > -1 && window.waittingAjaxMap[targetUrl].splice(index, 1)
+      if (window.waittingAjaxMap[targetUrl].length === 0) {
+        delete window.waittingAjaxMap[targetUrl]
       }
     })
   }
 })
+
 ```
 - 在目标 dom 上，添加 v-waiting 属性
   ```<div class="btn" v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1'" @click="ajaxSingleTest">发送单个请求 loading</div>```
@@ -262,6 +296,13 @@ Vue.directive('waiting', {
 
   ![](http://upyun.luckly-mjw.cn/Assets/click-constraint/002.jpeg)
 
+- 传入类似 axios 的请求配置函数
+  - `<div class="btn" v-waiting="importAxiosFun" @click="ajaxFromImport">传递请求函数</div>`
+  - 底层实现原理是，调用 Function.prototype.toString() 获取请求配置函数的源码，解析函数中的请求配置参数
+  - 适合将接口请求配置独立抽离管理的项目，屏蔽具体的请求 URL 路径
+  - 【特别注意】由于 [Function.prototype.toString](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/toString) 限制，this 被 bind 修改过的函数无法解析。例如，写在 vue methods 中定义的函数，toString 得到的只是 `function () { [native code] }`，无法获取函数源代码。但一般接口管理函数不会存在该问题。
+  - 原生 JS 版暂不支持该功能
+  ![](http://upyun.luckly-mjw.cn/Assets/click-constraint/008.png)
 
 ### 实现原理
 - 重写 「XMLHttpRequest」，实现 ajax 的底层通用性监听，在接口发起时添加样式，返回结果后消除。
@@ -444,6 +485,32 @@ Vue.directive('waiting', {
 
 ### VUE 自定义指令版，源码如下
 ```
+/** 核心代码，监听 ajax，自动为匹配到的 dom 元素添加点击约束  **/
+// eslint-disable-next-line
+// <div id="1" v-waiting="['get::waiting::/test/users?pageIndex=2', 'get::/test/users?pageIndex=1']" @click="test"></div>
+// <div id="2" v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2'" @click="test">copy</div>
+// <div id="3" v-waiting="'get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2'" @click="test">copy</div>
+// <div v-waiting="userApi.postLogin" @click="test1">兼容传入 axios 请求函数</div>
+
+// 兼容转换传入的函数，转化为 URL 字符串
+function cmptFunStrToUrl(targetList) {
+  targetList = Array.isArray(targetList) ? targetList : [targetList] // 兼容转化为数组
+  return targetList.map(targetItem => {
+    if (typeof targetItem === 'function') { // 如果传入的是函数
+      const funStr = targetItem.toString() // 将函数转化为字符串，进行解析
+      if (funStr === 'function () { [native code] }') {
+        throw new Error(`点击约束，因 Function.prototype.toString 限制，this 被 bind 修改过的函数无法解析, 请显式输入 url 字符串。 ${targetItem.name}，详情可参考 https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/toString`)
+      }
+      const [, method, apiURL] = (funStr.match(/\.(get|post|delete|put|patch)\(['"`]([^'"`]+)/) || [])
+      if (!method || !apiURL) {
+        throw new Error(`点击约束，传入的函数解析失败, ${targetItem.name}`)
+      }
+      return `${method}::${apiURL}`
+    }
+    return targetItem
+  })
+}
+
 Vue.directive('waiting', {
   bind: (targetDom, binding) => {
     // 注入全局方法
@@ -452,7 +519,7 @@ Vue.directive('waiting', {
         return
       }
       window.hadResetAjaxForWaiting = true
-      window.waitingAjaxMap = {} // 接口映射 'get::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1': dom
+      window.waittingAjaxMap = {} // 接口映射 'get::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1': dom
 
       let OriginXHR = window.XMLHttpRequest
       let originOpen = OriginXHR.prototype.open
@@ -463,7 +530,7 @@ Vue.directive('waiting', {
         let realXHR = new OriginXHR() // 重置操作函数，获取请求数据
 
         realXHR.open = function(method, url, asyn) {
-          Object.keys(window.waitingAjaxMap).forEach(key => {
+          Object.keys(window.waittingAjaxMap).forEach(key => {
             let [targetMethod, type, targetUrl] = key.split('::')
             if (!targetUrl) { // 设置默认类型
               targetUrl = type
@@ -471,9 +538,12 @@ Vue.directive('waiting', {
             } else { // 指定类型
               type = `v-waiting-${type}`
             }
-            if (targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase() && url.indexOf(targetUrl) > -1) {
-              targetDomList = [...window.waitingAjaxMap[key], ...targetDomList]
-              window.waitingAjaxMap[key].forEach(dom => {
+            if (
+              targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase()
+              && (url.indexOf(targetUrl) > -1 || new RegExp(targetUrl).test(url))
+            ) {
+              targetDomList = [...window.waittingAjaxMap[key], ...targetDomList]
+              window.waittingAjaxMap[key].forEach(dom => {
                 if (!dom.classList.contains(type)) {
                   dom.classList.add('v-waiting', type)
                   if (window.getComputedStyle(dom).position === 'static') { // 如果是 static 定位，则修改为 relative，为伪类的绝对定位做准备
@@ -584,25 +654,32 @@ Vue.directive('waiting', {
     })()
 
     // 添加需要监听的接口，注入对应的 dom
-    const targetUrlList = Array.isArray(binding.value) ? binding.value : [binding.value]
+    /*
+      postLogin(body) {
+        return api.post('/api/operation/user/login', body)
+      }
+      则传入 postLogin，会自动解析该函数的配置
+      <div v-waiting="userApi.postLogin" @click="test1">兼容传入 axios 请求函数</div>
+    */
+    const targetUrlList = cmptFunStrToUrl(binding.value)
     targetUrlList.forEach(targetUrl => {
-      window.waitingAjaxMap[targetUrl] = [targetDom, ...(window.waitingAjaxMap[targetUrl] || [])]
+      window.waittingAjaxMap[targetUrl] = [targetDom, ...(window.waittingAjaxMap[targetUrl] || [])]
     })
   },
 
   // 参数变化
   update: (targetDom, binding) => {
     if (binding.oldValue !== binding.value) {
-      const preTargetUrlList = Array.isArray(binding.oldValue) ? binding.oldValue : [binding.oldValue]
+      const preTargetUrlList = cmptFunStrToUrl(binding.oldValue)
       preTargetUrlList.forEach(targetUrl => {
-        const index = (window.waitingAjaxMap[targetUrl] || []).indexOf(targetDom)
-        index > -1 && window.waitingAjaxMap[targetUrl].splice(index, 1)
+        const index = (window.waittingAjaxMap[targetUrl] || []).indexOf(targetDom)
+        index > -1 && window.waittingAjaxMap[targetUrl].splice(index, 1)
       })
 
       // 添加需要监听的接口，注入对应的 dom
-      const targetUrlList = Array.isArray(binding.value) ? binding.value : [binding.value]
+      const targetUrlList = cmptFunStrToUrl(binding.value)
       targetUrlList.forEach(targetUrl => {
-        window.waitingAjaxMap[targetUrl] = [targetDom, ...(window.waitingAjaxMap[targetUrl] || [])]
+        window.waittingAjaxMap[targetUrl] = [targetDom, ...(window.waittingAjaxMap[targetUrl] || [])]
       })
     }
   },
@@ -611,14 +688,15 @@ Vue.directive('waiting', {
   unbind: (targetDom, binding) => {
     const targetUrlList = typeof binding.value === 'object' ? binding.value : [binding.value]
     targetUrlList.forEach(targetUrl => {
-      const index = window.waitingAjaxMap[targetUrl].indexOf(targetDom)
-      index > -1 && window.waitingAjaxMap[targetUrl].splice(index, 1)
-      if (window.waitingAjaxMap[targetUrl].length === 0) {
-        delete window.waitingAjaxMap[targetUrl]
+      const index = window.waittingAjaxMap[targetUrl].indexOf(targetDom)
+      index > -1 && window.waittingAjaxMap[targetUrl].splice(index, 1)
+      if (window.waittingAjaxMap[targetUrl].length === 0) {
+        delete window.waittingAjaxMap[targetUrl]
       }
     })
   }
 })
+
 ```
 
 ### 注意事项

@@ -12,6 +12,7 @@ import { Loading as ElLoading } from '@bihu/element-ui'
  * @param {string} element-loading-custom-class   自定义类名
  * @example <div v-waiting="['get::/test/users?pageIndex=2', 'get::/test/users?pageIndex=1']" @click="test">点击</div>
  * @example <div v-waiting="'get::http://www.baidu.com/mock/50/test/users?pageIndex=2'" @click="test1">点击</div>
+ * @example <div v-waiting="userApi.postLogin" @click="test1">兼容传入 axios 请求函数</div>
  * @example
  <div
    v-waiting="'get::http://www.baidu.com/mock/50/test/users?pageIndex=2'"
@@ -99,10 +100,36 @@ waitingDirective.install = v => {
     }
   })()
 
+  // 兼容转换传入的 axios 请求函数，转化为 URL 字符串
+  /*
+  postLogin(body) {
+    return api.post('/api/operation/user/login', body)
+  }
+  则传入 postLogin，会自动解析该函数的配置
+  <div v-waiting="userApi.postLogin" @click="test1">兼容传入 axios 请求函数</div>
+   */
+  function cmptFunStrToUrl(targetList) {
+    targetList = Array.isArray(targetList) ? targetList : [targetList] // 兼容转化为数组
+    return targetList.map(targetItem => {
+      if (typeof targetItem === 'function') { // 如果传入的是函数
+        const funStr = targetItem.toString() // 将函数转化为字符串，进行解析
+        if (funStr === 'function () { [native code] }') {
+          throw new Error(`点击约束，因 Function.prototype.toString 限制，this 被 bind 修改过的函数无法解析, 请显式输入 url 字符串。 ${targetItem.name}，详情可参考 https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/toString`)
+        }
+        const [, method, apiURL] = (funStr.match(/\.(get|post|delete|put|patch)\(['"`]([^'"`]+)/) || [])
+        if (!method || !apiURL) {
+          throw new Error(`点击约束，传入的函数解析失败, ${targetItem.name}`)
+        }
+        return `${method}::${apiURL}`
+      }
+      return targetItem
+    })
+  }
+
   v.directive('waiting', {
     bind: (targetDom, binding) => {
       // 添加需要监听的接口，注入对应的 dom
-      const targetUrlList = Array.isArray(binding.value) ? binding.value : [binding.value]
+      const targetUrlList = cmptFunStrToUrl(binding.value)
       targetUrlList.forEach(targetUrl => {
         window.waitingAjaxMap[targetUrl] = [targetDom, ...(window.waitingAjaxMap[targetUrl] || [])]
       })
@@ -111,7 +138,7 @@ waitingDirective.install = v => {
     // 参数变化
     update: (targetDom, binding) => {
       if (binding.oldValue !== binding.value) {
-        const preTargetUrlList = Array.isArray(binding.oldValue) ? binding.oldValue : [binding.oldValue]
+        const preTargetUrlList = cmptFunStrToUrl(binding.oldValue)
         preTargetUrlList.forEach(targetUrl => {
           const index = (window.waitingAjaxMap[targetUrl] || []).indexOf(targetDom)
           index > -1 && window.waitingAjaxMap[targetUrl].splice(index, 1)
@@ -127,7 +154,7 @@ waitingDirective.install = v => {
 
     // 指令被卸载，消除消息监听
     unbind: (targetDom, binding) => {
-      const targetUrlList = typeof binding.value === 'object' ? binding.value : [binding.value]
+      const targetUrlList = cmptFunStrToUrl(binding.value)
       targetUrlList.forEach(targetUrl => {
         const index = window.waitingAjaxMap[targetUrl].indexOf(targetDom)
         index > -1 && window.waitingAjaxMap[targetUrl].splice(index, 1)
