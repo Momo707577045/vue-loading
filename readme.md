@@ -98,7 +98,7 @@ Vue.directive('waiting', {
       window.waittingAjaxMap = {} // 接口映射 'get::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1': dom
 
       let OriginXHR = window.XMLHttpRequest
-      let originOpen = OriginXHR.prototype.open
+      let originOpen = OriginXHR.prototype?.open || OriginXHR.open
 
       // 重置 XMLHttpRequest
       window.XMLHttpRequest = function() {
@@ -329,7 +329,7 @@ Vue.directive('waiting', {
   window.waittingAjaxMap = {} // 接口映射 'get::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1': dom
 
   let OriginXHR = window.XMLHttpRequest
-  let originOpen = OriginXHR.prototype.open
+  let originOpen = OriginXHR.prototype?.open || OriginXHR.open
   let isSameSpace = false // 是否在同一个宏任务中，避免频繁触发
 
   // 检测使用到的 dom 对象
@@ -522,7 +522,7 @@ Vue.directive('waiting', {
       window.waittingAjaxMap = {} // 接口映射 'get::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1': dom
 
       let OriginXHR = window.XMLHttpRequest
-      let originOpen = OriginXHR.prototype.open
+      let originOpen = OriginXHR.prototype?.open || OriginXHR.open
 
       // 重置 XMLHttpRequest
       window.XMLHttpRequest = function() {

@@ -29,7 +29,7 @@ const waitingDirective = {}
 waitingDirective.install = v => {
 
   // 注入全局方法
-  (function() {
+  (function () {
     // 如果已经重置过，则不再进入。解决开发时局部刷新导致重新加载问题
     if (window.hadResetAjaxForWaiting) {
       return
@@ -39,14 +39,14 @@ waitingDirective.install = v => {
 
     // 保存一份原生的 XMLHttpRequest 对象 和 open 方法
     let OriginXHR = window.XMLHttpRequest
-    let originOpen = OriginXHR.prototype.open
+    let originOpen = OriginXHR.prototype?.open || OriginXHR.open
 
     // 重置 XMLHttpRequest
-    window.XMLHttpRequest = function() {
+    window.XMLHttpRequest = function () {
       let targetDomList = [] // 存储 ajax 请求，影响到的 dom 元素
       let realXHR = new OriginXHR() // 实例化出一份新的 XMLHttpRequest对象，来进行重载
 
-      realXHR.open = function(method, url, async) {
+      realXHR.open = function (method, url, async) {
         Object.keys(window.waitingAjaxMap).forEach(key => {
           let [targetMethod, type, targetUrl] = key.split('::')
           if (!targetUrl) {

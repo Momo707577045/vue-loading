@@ -27,7 +27,7 @@ function cmptFunStrToUrl(targetList) {
 Vue.directive('waiting', {
   bind: (targetDom, binding) => {
     // 注入全局方法
-    (function() {
+    (function () {
       if (window.hadResetAjaxForWaiting) { // 如果已经重置过，则不再进入。解决开发时局部刷新导致重新加载问题
         return
       }
@@ -35,14 +35,14 @@ Vue.directive('waiting', {
       window.waittingAjaxMap = {} // 接口映射 'get::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1': dom
 
       let OriginXHR = window.XMLHttpRequest
-      let originOpen = OriginXHR.prototype.open
+      let originOpen = OriginXHR.prototype?.open || OriginXHR.open
 
       // 重置 XMLHttpRequest
-      window.XMLHttpRequest = function() {
+      window.XMLHttpRequest = function () {
         let targetDomList = [] // 存储本 ajax 请求，影响到的 dom 元素
         let realXHR = new OriginXHR() // 重置操作函数，获取请求数据
 
-        realXHR.open = function(method, url, asyn) {
+        realXHR.open = function (method, url, asyn) {
           Object.keys(window.waittingAjaxMap).forEach(key => {
             let [targetMethod, type, targetUrl] = key.split('::')
             if (!targetUrl) { // 设置默认类型

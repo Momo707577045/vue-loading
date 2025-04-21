@@ -10,299 +10,289 @@
   <meta name="description" content="点击约束,一劳永逸,点击约束：某个按钮触发一次点击后，待接口调用有结果都才能再次触发。避免用户多次点击，触发多次接口调用。">
   <title>Click Constraint 点击约束</title>
   <style>
-  /*外链代码*/
-  .m-p-other, .m-p-github, .m-p-origin {
-    position: fixed;
-    right: 50px;
-    background-color: #eff3f6;
-    background-image: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
-    color: #24292e;
-    border: 1px solid rgba(27, 31, 35, .2);
-    border-radius: 3px;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 20px;
-    padding: 6px 12px;
-    z-index: 99;
-  }
-  .m-p-help {
-    position: fixed;
-    right: 50px;
-    top: 50px;
-    width: 30px;
-    height: 30px;
-    color: #666666;
-    z-index: 2;
-    line-height: 30px;
-    text-align: center;
-    font-weight: bolder;
-    border-radius: 50%;
-    border: 1px solid rgba(27, 31, 35, .2);
-    cursor: pointer;
-    background-color: #eff3f6;
-    background-image: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
-  }
-  .m-p-github:hover, .m-p-other:hover, .m-p-help:hover, .m-p-origin:hover {
-    opacity: 0.9;
-  }
-  .m-p-origin {
-    bottom: 30px;
-  }
-  .m-p-other {
-    bottom: 70px;
-  }
-  .m-p-github {
-    bottom: 110px;
-  }
-  /*功能代码*/
-  .title {
-    margin: 30px auto;
-    max-width: 1100px;
-    width: 100%;
-    font-size: 35px;
-    text-align: center;
-    font-weight: bold;
-  }
-  .btn {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 20px;
-    color: white;
-    cursor: pointer;
-    border-radius: 4px;
-    border: 1px solid #eeeeee;
-    background-color: #3D8AC7;
-    opacity: 1;
-    transition: 0.3s all;
-  }
-  .content {
-    margin-top: 30px;
-    background-color: #fafafa;
-  }
-  .content table {
-    width: 100%;
-    text-align: center;
-    border-collapse: collapse;
-  }
-  .content th, td {
-    position: relative;
-    padding: 17px 10px;
-    border: 1px solid #E5E5E5;
-    box-sizing: border-box;
-    white-space: pre-line;
-  }
-  .content .empty {
-    padding: 30px 0;
-    font-size: 26px;
-    font-weight: bold;
-    text-align: center;
-  }
+    /*外链代码*/
+    .m-p-other,
+    .m-p-github,
+    .m-p-origin {
+      position: fixed;
+      right: 50px;
+      background-color: #eff3f6;
+      background-image: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
+      color: #24292e;
+      border: 1px solid rgba(27, 31, 35, .2);
+      border-radius: 3px;
+      cursor: pointer;
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 20px;
+      padding: 6px 12px;
+      z-index: 99;
+    }
+
+    .m-p-help {
+      position: fixed;
+      right: 50px;
+      top: 50px;
+      width: 30px;
+      height: 30px;
+      color: #666666;
+      z-index: 2;
+      line-height: 30px;
+      text-align: center;
+      font-weight: bolder;
+      border-radius: 50%;
+      border: 1px solid rgba(27, 31, 35, .2);
+      cursor: pointer;
+      background-color: #eff3f6;
+      background-image: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
+    }
+
+    .m-p-github:hover,
+    .m-p-other:hover,
+    .m-p-help:hover,
+    .m-p-origin:hover {
+      opacity: 0.9;
+    }
+
+    .m-p-origin {
+      bottom: 30px;
+    }
+
+    .m-p-other {
+      bottom: 70px;
+    }
+
+    .m-p-github {
+      bottom: 110px;
+    }
+
+    /*功能代码*/
+    .title {
+      margin: 30px auto;
+      max-width: 1100px;
+      width: 100%;
+      font-size: 35px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 20px;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+      border: 1px solid #eeeeee;
+      background-color: #3D8AC7;
+      opacity: 1;
+      transition: 0.3s all;
+    }
+
+    .content {
+      margin-top: 30px;
+      background-color: #fafafa;
+    }
+
+    .content table {
+      width: 100%;
+      text-align: center;
+      border-collapse: collapse;
+    }
+
+    .content th,
+    td {
+      position: relative;
+      padding: 17px 10px;
+      border: 1px solid #E5E5E5;
+      box-sizing: border-box;
+      white-space: pre-line;
+    }
+
+    .content .empty {
+      padding: 30px 0;
+      font-size: 26px;
+      font-weight: bold;
+      text-align: center;
+    }
   </style>
 </head>
 
 <body>
-<section class="title">点击约束解决方案示例</section>
-<body>
-<div id="loading">
-  页面加载中，请耐心等待...
-  <h1 style="white-space: pre;">
-    推荐一个点击约束解决方案，一劳永逸，
-    点击约束：某个按钮触发一次点击后，待接口调用有结果都才能再次触发。避免用户多次点击，触发多次接口调用。
-    工具链接：https://blog.luckly-mjw.cn/tool-show/vue-loading/index.html
-  </h1>
-</div>
-<section id="m-app" v-cloak>
-  <a class="m-p-help" target="_blank" href="https://segmentfault.com/a/1190000039831156">?</a>
-  <a class="m-p-github" target="_blank" href="https://github.com/Momo707577045/vue-loading">github</a>
-  <a class="m-p-other" target="_blank" href="http://blog.luckly-mjw.cn/tool-show/index.html">其他效率工具</a>
-  <a class="m-p-origin" target="_blank" href="http://blog.luckly-mjw.cn/tool-show/vue-loading/demo-origin-js.html">原生 JS 兼容版</a>
+  <section class="title">点击约束解决方案示例</section>
 
-  <div
-    class="btn"
-    v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/\\d+/test/$'"
-    @click="ajaxSingleStrictTest"
-  >正则匹配，精确匹配，单个请求 loading</div>
+  <body>
+    <div id="loading">
+      页面加载中，请耐心等待...
+      <h1 style="white-space: pre;">
+        推荐一个点击约束解决方案，一劳永逸，
+        点击约束：某个按钮触发一次点击后，待接口调用有结果都才能再次触发。避免用户多次点击，触发多次接口调用。
+        工具链接：https://blog.luckly-mjw.cn/tool-show/vue-loading/index.html
+        <img src="https://upyun.luckly-mjw.cn/Assets/blog/click-constraint-121-75.png" alt="loading 点击约束解决" title="logo" />
+        <a target="_blank" href="https://blog.luckly-mjw.cn/tool-show/vue-loading/demo.html">点击跳转</a>
+      </h1>
+    </div>
+    <section id="m-app" v-cloak>
+      <a class="m-p-help" target="_blank" href="https://segmentfault.com/a/1190000039831156">?</a>
+      <a class="m-p-github" target="_blank" href="https://github.com/Momo707577045/vue-loading">github</a>
+      <a class="m-p-other" target="_blank" href="http://blog.luckly-mjw.cn/tool-show/index.html">其他效率工具</a>
+      <a class="m-p-origin" target="_blank" href="http://blog.luckly-mjw.cn/tool-show/vue-loading/demo-origin-js.html">原生 JS 兼容版</a>
 
-  <div
-    class="btn"
-    v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/\\d+/test/users'"
-    @click="ajaxSingleTest"
-  >正则匹配，匹配数值，发送单个请求 loading</div>
+      <div class="btn" v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/\\d+/test/$'" @click="ajaxSingleStrictTest">正则匹配，精确匹配，单个请求 loading</div>
 
-  <div
-    class="btn"
-    v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/50/test/users'"
-    @click="ajaxSingleTest"
-  >发送单个请求 loading</div>
+      <div class="btn" v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/\\d+/test/users'" @click="ajaxSingleTest">正则匹配，匹配数值，发送单个请求 loading</div>
 
-  <div
-    class="btn"
-    v-waiting="'get::waiting::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1'"
-    @click="ajaxSingleTest"
-  >发送单个请求 waiting</div>
+      <div class="btn" v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/50/test/users'" @click="ajaxSingleTest">发送单个请求 loading</div>
 
-  <div
-    class="btn"
-    v-waiting="'get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1'"
-    @click="ajaxSingleTest"
-  >发送单个请求 disable</div>
+      <div class="btn" v-waiting="'get::waiting::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1'" @click="ajaxSingleTest">发送单个请求 waiting</div>
 
-  <div
-    class="btn"
-    v-waiting="['get::loading::/mock/50/test/user/', 'get::/test/users?pageIndex=2']"
-    @click="ajaxMultiTest"
-  >发送多个请求</div>
+      <div class="btn" v-waiting="'get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1'" @click="ajaxSingleTest">发送单个请求 disable</div>
 
-  <div class="btn"
-      v-waiting="importAxiosFun"
-      @click="ajaxFromImport"
-  >传递请求函数 {{ importAxiosFun }}</div>
+      <div class="btn" v-waiting="['get::loading::/mock/50/test/user/', 'get::/test/users?pageIndex=2']" @click="ajaxMultiTest">发送多个请求</div>
 
-  <!--内容区添加数据加载中遮罩loading-->
-  <div
-    class="content"
-    v-waiting="[
+      <div class="btn" v-waiting="importAxiosFun" @click="ajaxFromImport">传递请求函数 {{ importAxiosFun }}</div>
+
+      <!--内容区添加数据加载中遮罩loading-->
+      <div class="content" v-waiting="[
       'get::waiting::/mock/50/test/user',
       'get::/test/users?pageIndex=1',
       'get::/test/users?pageIndex=2'
-    ]"
-  >
-    <table>
-      <thead>
-      <tr>
-        <th>id</th>
-        <th>姓名</th>
-        <th>性别</th>
-        <th>资产</th>
-        <th>工作编号</th>
-      </tr>
-      </thead>
-      <tbody v-if="dataList.length > 0">
-      <tr v-for="dataItem in dataList" :key="dataItem.id">
-        <td>{{ dataItem.id }}</td>
-        <td>{{ dataItem.userName }}</td>
-        <td>{{ dataItem.sex }}</td>
-        <td>{{ dataItem.money }}</td>
-        <td>{{ dataItem.jobNum }}</td>
-      </tr>
-      </tbody>
-    </table>
-    <div class="empty" v-if="dataList.length===0">暂无数据</div>
-  </div>
-</section>
-</body>
-<script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "https://hm.baidu.com/hm.js?1f12b0865d866ae1b93514870d93ce89";
-  var s = document.getElementsByTagName("script")[0];
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
-<!--vue 前端框架-->
-<script src="./vue.js"></script>
-<!--请求库，不依赖特定库，这里只是做示例-->
-<script src="./axios.min.js"></script>
-<script>
-document.getElementById('loading') && document.getElementById('loading').remove()
-
-/** 核心代码，监听 ajax，自动为匹配到的 dom 元素添加点击约束  **/
-// eslint-disable-next-line
-// <div id="1" v-waiting="['get::waiting::/test/users?pageIndex=2', 'get::/test/users?pageIndex=1']" @click="test"></div>
-// <div id="2" v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2'" @click="test">copy</div>
-// <div id="3" v-waiting="'get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2'" @click="test">copy</div>
-// <div v-waiting="userApi.postLogin" @click="test1">兼容传入 axios 请求函数</div>
-
-// 兼容转换传入的函数，转化为 URL 字符串
-function cmptFunStrToUrl(targetList) {
-  targetList = Array.isArray(targetList) ? targetList : [targetList] // 兼容转化为数组
-  return targetList.map(targetItem => {
-    if (typeof targetItem === 'function') { // 如果传入的是函数
-      const funStr = targetItem.toString() // 将函数转化为字符串，进行解析
-      if (funStr === 'function () { [native code] }') {
-        throw new Error(`点击约束，因 Function.prototype.toString 限制，this 被 bind 修改过的函数无法解析, 请显式输入 url 字符串。 ${targetItem.name}，详情可参考 https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/toString`)
-      }
-      console.log(funStr)
-      const [, method, apiURL] = (funStr.match(/\.(get|post|delete|put|patch)\(['"`]([^'"`]+)/) || [])
-      if (!method || !apiURL) {
-        throw new Error(`点击约束，传入的函数解析失败, ${targetItem.name}`, funStr)
-      }
-      return `${method}::${apiURL}`
-    }
-    return targetItem
-  })
-}
-
-Vue.directive('waiting', {
-  bind: (targetDom, binding) => {
-    // 注入全局方法
-    (function() {
-      if (window.hadResetAjaxForWaiting) { // 如果已经重置过，则不再进入。解决开发时局部刷新导致重新加载问题
-        return
-      }
-      window.hadResetAjaxForWaiting = true
-      window.waittingAjaxMap = {} // 接口映射 'get::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1': dom
-
-      let OriginXHR = window.XMLHttpRequest
-      let originOpen = OriginXHR.prototype.open
-
-      // 重置 XMLHttpRequest
-      window.XMLHttpRequest = function() {
-        let targetDomList = [] // 存储本 ajax 请求，影响到的 dom 元素
-        let realXHR = new OriginXHR() // 重置操作函数，获取请求数据
-
-        realXHR.open = function(method, url, asyn) {
-          Object.keys(window.waittingAjaxMap).forEach(key => {
-            let [targetMethod, type, targetUrl] = key.split('::')
-            if (!targetUrl) { // 设置默认类型
-              targetUrl = type
-              type = 'v-waiting-waiting'
-            } else { // 指定类型
-              type = `v-waiting-${type}`
-            }
-            if (
-              targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase()
-              && (url.indexOf(targetUrl) > -1 || new RegExp(targetUrl).test(url))
-            ) {
-              targetDomList = [...window.waittingAjaxMap[key], ...targetDomList]
-              window.waittingAjaxMap[key].forEach(dom => {
-                if (!dom.classList.contains(type)) {
-                  dom.classList.add('v-waiting', type)
-                  if (window.getComputedStyle(dom).position === 'static') { // 如果是 static 定位，则修改为 relative，为伪类的绝对定位做准备
-                    dom.style.position = 'relative'
-                  }
-                }
-                dom.waitingAjaxNum = dom.waitingAjaxNum || 0 // 不使用 dataset，是应为 dataset 并不实时，在同一个时间内，上一次存储的值不能被保存
-                dom.waitingAjaxNum++
-              })
-            }
-          })
-          originOpen.call(realXHR, method, url, asyn)
-        }
-
-        // 监听加载完成，清除 waiting
-        realXHR.addEventListener('loadend', () => {
-          targetDomList.forEach(dom => {
-            dom.waitingAjaxNum--
-            dom.waitingAjaxNum === 0 && dom.classList.remove(
-              'v-waiting',
-              'v-waiting-loading',
-              'v-waiting-waiting',
-              'v-waiting-disable',
-            )
-          })
-        }, false)
-        return realXHR
-      }
+    ]">
+        <table>
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>姓名</th>
+              <th>性别</th>
+              <th>资产</th>
+              <th>工作编号</th>
+            </tr>
+          </thead>
+          <tbody v-if="dataList.length > 0">
+            <tr v-for="dataItem in dataList" :key="dataItem.id">
+              <td>{{ dataItem.id }}</td>
+              <td>{{ dataItem.userName }}</td>
+              <td>{{ dataItem.sex }}</td>
+              <td>{{ dataItem.money }}</td>
+              <td>{{ dataItem.jobNum }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="empty" v-if="dataList.length===0">暂无数据</div>
+      </div>
+    </section>
+  </body>
+  <script>
+    var _hmt = _hmt || [];
+    (function () {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?1f12b0865d866ae1b93514870d93ce89";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
     })();
+  </script>
+  <!--vue 前端框架-->
+  <script src="//upyun.luckly-mjw.cn/lib/vue.js"></script>
+  <!--请求库，不依赖特定库，这里只是做示例-->
+  <script src="//upyun.luckly-mjw.cn/lib/axios.min.js"></script>
+  <script>
+    document.getElementById('loading') && document.getElementById('loading').remove()
 
-    // 注入全局 css
-    (() => {
-      if (!document.getElementById('v-waiting')) {
-        let code = `
+    /** 核心代码，监听 ajax，自动为匹配到的 dom 元素添加点击约束  **/
+    // eslint-disable-next-line
+    // <div id="1" v-waiting="['get::waiting::/test/users?pageIndex=2', 'get::/test/users?pageIndex=1']" @click="test"></div>
+    // <div id="2" v-waiting="'get::loading::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2'" @click="test">copy</div>
+    // <div id="3" v-waiting="'get::disable::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2'" @click="test">copy</div>
+    // <div v-waiting="userApi.postLogin" @click="test1">兼容传入 axios 请求函数</div>
+
+    // 兼容转换传入的函数，转化为 URL 字符串
+    function cmptFunStrToUrl(targetList) {
+      targetList = Array.isArray(targetList) ? targetList : [targetList] // 兼容转化为数组
+      return targetList.map(targetItem => {
+        if (typeof targetItem === 'function') { // 如果传入的是函数
+          const funStr = targetItem.toString() // 将函数转化为字符串，进行解析
+          if (funStr === 'function () { [native code] }') {
+            throw new Error(`点击约束，因 Function.prototype.toString 限制，this 被 bind 修改过的函数无法解析, 请显式输入 url 字符串。 ${targetItem.name}，详情可参考 https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/toString`)
+          }
+          console.log(funStr)
+          const [, method, apiURL] = (funStr.match(/\.(get|post|delete|put|patch)\(['"`]([^'"`]+)/) || [])
+          if (!method || !apiURL) {
+            throw new Error(`点击约束，传入的函数解析失败, ${targetItem.name}`, funStr)
+          }
+          return `${method}::${apiURL}`
+        }
+        return targetItem
+      })
+    }
+
+    Vue.directive('waiting', {
+      bind: (targetDom, binding) => {
+        // 注入全局方法
+        (function () {
+          if (window.hadResetAjaxForWaiting) { // 如果已经重置过，则不再进入。解决开发时局部刷新导致重新加载问题
+            return
+          }
+          window.hadResetAjaxForWaiting = true
+          window.waittingAjaxMap = {} // 接口映射 'get::http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1': dom
+
+          let OriginXHR = window.XMLHttpRequest
+          let originOpen = OriginXHR.prototype?.open || OriginXHR.open
+
+          // 重置 XMLHttpRequest
+          window.XMLHttpRequest = function () {
+            let targetDomList = [] // 存储本 ajax 请求，影响到的 dom 元素
+            let realXHR = new OriginXHR() // 重置操作函数，获取请求数据
+
+            realXHR.open = function (method, url, asyn) {
+              Object.keys(window.waittingAjaxMap).forEach(key => {
+                let [targetMethod, type, targetUrl] = key.split('::')
+                if (!targetUrl) { // 设置默认类型
+                  targetUrl = type
+                  type = 'v-waiting-waiting'
+                } else { // 指定类型
+                  type = `v-waiting-${type}`
+                }
+                if (
+                  targetMethod.toLocaleLowerCase() === method.toLocaleLowerCase()
+                  && (url.indexOf(targetUrl) > -1 || new RegExp(targetUrl).test(url))
+                ) {
+                  targetDomList = [...window.waittingAjaxMap[key], ...targetDomList]
+                  window.waittingAjaxMap[key].forEach(dom => {
+                    if (!dom.classList.contains(type)) {
+                      dom.classList.add('v-waiting', type)
+                      if (window.getComputedStyle(dom).position === 'static') { // 如果是 static 定位，则修改为 relative，为伪类的绝对定位做准备
+                        dom.style.position = 'relative'
+                      }
+                    }
+                    dom.waitingAjaxNum = dom.waitingAjaxNum || 0 // 不使用 dataset，是应为 dataset 并不实时，在同一个时间内，上一次存储的值不能被保存
+                    dom.waitingAjaxNum++
+                  })
+                }
+              })
+              originOpen.call(realXHR, method, url, asyn)
+            }
+
+            // 监听加载完成，清除 waiting
+            realXHR.addEventListener('loadend', () => {
+              targetDomList.forEach(dom => {
+                dom.waitingAjaxNum--
+                dom.waitingAjaxNum === 0 && dom.classList.remove(
+                  'v-waiting',
+                  'v-waiting-loading',
+                  'v-waiting-waiting',
+                  'v-waiting-disable',
+                )
+              })
+            }, false)
+            return realXHR
+          }
+        })();
+
+        // 注入全局 css
+        (() => {
+          if (!document.getElementById('v-waiting')) {
+            let code = `
        .v-waiting {
     pointer-events: none;
     /*cursor: not-allowed; 与 pointer-events: none 互斥，设置 pointer-events: none 后，设置鼠标样式无效 */
@@ -368,103 +358,103 @@ Vue.directive('waiting', {
       transform: translate(-50%, -50%) rotate(360deg);
     }
   }        `
-        let style = document.createElement('style')
-        style.id = 'v-waiting'
-        style.type = 'text/css'
-        style.rel = 'stylesheet'
-        style.appendChild(document.createTextNode(code))
-        let head = document.getElementsByTagName('head')[0]
-        head.appendChild(style)
+            let style = document.createElement('style')
+            style.id = 'v-waiting'
+            style.type = 'text/css'
+            style.rel = 'stylesheet'
+            style.appendChild(document.createTextNode(code))
+            let head = document.getElementsByTagName('head')[0]
+            head.appendChild(style)
+          }
+        })()
+
+        // 添加需要监听的接口，注入对应的 dom
+        const targetUrlList = cmptFunStrToUrl(binding.value)
+        targetUrlList.forEach(targetUrl => {
+          window.waittingAjaxMap[targetUrl] = [targetDom, ...(window.waittingAjaxMap[targetUrl] || [])]
+        })
+      },
+
+      // 参数变化
+      update: (targetDom, binding) => {
+        if (binding.oldValue !== binding.value) {
+          const preTargetUrlList = cmptFunStrToUrl(binding.oldValue)
+          preTargetUrlList.forEach(targetUrl => {
+            const index = (window.waittingAjaxMap[targetUrl] || []).indexOf(targetDom)
+            index > -1 && window.waittingAjaxMap[targetUrl].splice(index, 1)
+          })
+
+          // 添加需要监听的接口，注入对应的 dom
+          const targetUrlList = Array.isArray(binding.value) ? binding.value : [binding.value]
+          targetUrlList.forEach(targetUrl => {
+            window.waittingAjaxMap[targetUrl] = [targetDom, ...(window.waittingAjaxMap[targetUrl] || [])]
+          })
+        }
+      },
+
+      // 指令被卸载，消除消息监听
+      unbind: (targetDom, binding) => {
+        const targetUrlList = cmptFunStrToUrl(binding.value)
+        targetUrlList.forEach(targetUrl => {
+          const index = window.waittingAjaxMap[targetUrl].indexOf(targetDom)
+          index > -1 && window.waittingAjaxMap[targetUrl].splice(index, 1)
+          if (window.waittingAjaxMap[targetUrl].length === 0) {
+            delete window.waittingAjaxMap[targetUrl]
+          }
+        })
       }
-    })()
-
-    // 添加需要监听的接口，注入对应的 dom
-    const targetUrlList = cmptFunStrToUrl(binding.value)
-    targetUrlList.forEach(targetUrl => {
-      window.waittingAjaxMap[targetUrl] = [targetDom, ...(window.waittingAjaxMap[targetUrl] || [])]
     })
-  },
 
-  // 参数变化
-  update: (targetDom, binding) => {
-    if (binding.oldValue !== binding.value) {
-      const preTargetUrlList = cmptFunStrToUrl(binding.oldValue)
-      preTargetUrlList.forEach(targetUrl => {
-        const index = (window.waittingAjaxMap[targetUrl] || []).indexOf(targetDom)
-        index > -1 && window.waittingAjaxMap[targetUrl].splice(index, 1)
-      })
-
-      // 添加需要监听的接口，注入对应的 dom
-      const targetUrlList = Array.isArray(binding.value) ? binding.value : [binding.value]
-      targetUrlList.forEach(targetUrl => {
-        window.waittingAjaxMap[targetUrl] = [targetDom, ...(window.waittingAjaxMap[targetUrl] || [])]
-      })
+    // 外部 import 进来的 axios 请求配置
+    function importAxiosFun() {
+      return axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1')
     }
-  },
 
-  // 指令被卸载，消除消息监听
-  unbind: (targetDom, binding) => {
-    const targetUrlList = cmptFunStrToUrl(binding.value)
-    targetUrlList.forEach(targetUrl => {
-      const index = window.waittingAjaxMap[targetUrl].indexOf(targetDom)
-      index > -1 && window.waittingAjaxMap[targetUrl].splice(index, 1)
-      if (window.waittingAjaxMap[targetUrl].length === 0) {
-        delete window.waittingAjaxMap[targetUrl]
+    new Vue({
+      el: '#m-app',
+
+      data() {
+        return {
+          dataList: [],
+          importAxiosFun, // 定义同名变量，暴露到 vue 模板中
+        }
+      },
+
+      methods: {
+        // 调用外部 axios 配置函数
+        ajaxFromImport() {
+          importAxiosFun().then(res => {
+            console.log(res)
+            this.dataList = res.data.data.list
+          })
+        },
+
+        /// 正则精确匹配单个接口
+        ajaxSingleStrictTest() {
+          axios.get('http://yapi.luckly-mjw.cn/mock/50/test/').then(res => {
+            console.log(res)
+            this.dataList = res.data.data.list
+          })
+        },
+
+        // 请求单个接口
+        ajaxSingleTest() {
+          axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1').then(res => {
+            console.log(res)
+            this.dataList = res.data.data.list
+          })
+        },
+
+        // 请求多个接口，直到请求全部触发完成，才消除 loading 样式
+        ajaxMultiTest() {
+          axios.get('http://yapi.luckly-mjw.cn/mock/50/test/user/321')
+          axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2').then(res => {
+            console.log(res)
+            this.dataList = res.data.data.list
+          })
+        },
       }
     })
-  }
-})
-
-// 外部 import 进来的 axios 请求配置
-function importAxiosFun() {
-  return axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1')
-}
-
-new Vue({
-  el: '#m-app',
-
-  data() {
-    return {
-      dataList: [],
-      importAxiosFun, // 定义同名变量，暴露到 vue 模板中
-    }
-  },
-
-  methods: {
-    // 调用外部 axios 配置函数
-    ajaxFromImport(){
-      importAxiosFun().then(res => {
-        console.log(res)
-        this.dataList = res.data.data.list
-      })
-    },
-
-    /// 正则精确匹配单个接口
-    ajaxSingleStrictTest() {
-      axios.get('http://yapi.luckly-mjw.cn/mock/50/test/').then(res => {
-        console.log(res)
-        this.dataList = res.data.data.list
-      })
-    },
-
-    // 请求单个接口
-    ajaxSingleTest() {
-      axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=1').then(res => {
-        console.log(res)
-        this.dataList = res.data.data.list
-      })
-    },
-
-    // 请求多个接口，直到请求全部触发完成，才消除 loading 样式
-    ajaxMultiTest() {
-      axios.get('http://yapi.luckly-mjw.cn/mock/50/test/user/321')
-      axios.get('http://yapi.luckly-mjw.cn/mock/50/test/users?pageIndex=2').then(res => {
-        console.log(res)
-        this.dataList = res.data.data.list
-      })
-    },
-  }
-})
-</script>
+  </script>
 
 </html>
